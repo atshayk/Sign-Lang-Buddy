@@ -1,82 +1,78 @@
-import pickle
 import cv2
-import mediapipe.python.solutions.hands as hands_
-import mediapipe.python.solutions.drawing_utils as drawing_utils
-import mediapipe.python.solutions.drawing_styles as drawing_styles
-from mediapipe.python.solutions.hands_connections import HAND_CONNECTIONS as connect
 import numpy as np
+import mediapipe as mp
+from tensorflow.keras.models import load_model
+from collections import deque
+#import imutils
 
-model_dict = pickle.load(open('./model.p', 'rb'))
-model = model_dict['model']
+# Load the trained model
+model = load_model('asl_lstm_model.h5')
 
-cap = cv2.VideoCapture(0)  # Change to the correct camera index if needed
+# Initialize Mediapipe Hands
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
 
-mp_hands = hands_
-mp_drawing = drawing_utils
-mp_drawing_styles = drawing_styles
+hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.7)
 
-hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.7,min_tracking_confidence=0.7)
+# Create a dictionary for all signs
+signs = ['Yes','No','Thanks','Hello','Please','Goodbye','Sorry','You Are Welcome','I Love You']
+labels_dict = {i: signs[i] for i in range(len(signs))}
 
-labels_dict = {i: chr(65 + i) for i in range(26)}
+# Capture video
+cap = cv2.VideoCapture(0)
+
+sequence = deque(maxlen=20)  # Store the last 20 frames
 
 while True:
-    data_aux = []
-    x_ = []
-    y_ = []
-
     ret, frame = cap.read()
-
+    #frame = imutils.resize(frame, 720)
+    mirror_frame = cv2.flip(frame,1)
     if not ret:
         print("Failed to capture frame from camera. Check camera index in cv2.VideoCapture().")
         break
 
-    H, W, _ = frame.shape
-
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+    frame_rgb = cv2.cvtColor(mirror_frame, cv2.COLOR_BGR2RGB)
     results = hands.process(frame_rgb)
-    if results.multi_hand_landmarks:  # type: ignore
-        hand_landmarks = results.multi_hand_landmarks[0]  # type: ignore
-        mp_drawing.draw_landmarks(
-            frame,  # image to draw
-            hand_landmarks,  # model output
-            mp_hands.HAND_CONNECTIONS,  # hand connections
-            mp_drawing_styles.get_default_hand_landmarks_style(),
-            mp_drawing_styles.get_default_hand_connections_style()
-        )
 
-        for i in range(len(hand_landmarks.landmark)):
-            x = hand_landmarks.landmark[i].x
-            y = hand_landmarks.landmark[i].y
+    data_aux = []
+    x_ = []
+    y_ = []
 
-            x_.append(x)
-            y_.append(y)
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                mirror_frame,  # image to draw
+                hand_landmarks,  # model output
+                mp_hands.HAND_CONNECTIONS,  # hand connections
+                mp_drawing_styles.get_default_hand_landmarks_style(),
+                mp_drawing_styles.get_default_hand_connections_style()
+            )
 
-        for i in range(len(hand_landmarks.landmark)):
-            x = hand_landmarks.landmark[i].x
-            y = hand_landmarks.landmark[i].y
-            data_aux.append(x - min(x_))
-            data_aux.append(y - min(y_))
+            for i in range(len(hand_landmarks.landmark)):
+                x = hand_landmarks.landmark[i].x
+                y = hand_landmarks.landmark[i].y
 
-        if len(data_aux) == 42:  # Ensure data_aux is not empty
-            x1 = int(min(x_) * W) - 10
-            y1 = int(min(y_) * H) - 10
+                x_.append(x)
+                y_.append(y)
 
-            x2 = int(max(x_) * W) - 10
-            y2 = int(max(y_) * H) - 10
+            for i in range(len(hand_landmarks.landmark)):
+                x = hand_landmarks.landmark[i].x
+                y = hand_landmarks.landmark[i].y
+                data_aux.append(x - min(x_))
+                data_aux.append(y - min(y_))
 
-            prediction = model.predict([np.asarray(data_aux)])
+    if len(data_aux) == 42:
+        sequence.append(data_aux)
 
-            predicted_character = labels_dict[int(prediction[0])]
+    if len(sequence) == 20:
+        prediction = model.predict(np.expand_dims(sequence, axis=0))
+        predicted_sign = labels_dict[np.argmax(prediction)]
 
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
-            cv2.putText(frame, predicted_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3,cv2.LINE_AA)
-        else:
-            print(f"Detected landmarks are inconsistent: expected 42, got {len(data_aux)}")
-
-    cv2.putText(frame, "Press Q to close", (100,50), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (255, 124, 0), 3,cv2.LINE_AA)
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to exit the loop
+        cv2.putText(mirror_frame, predicted_sign, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3, cv2.LINE_AA)
+    
+    cv2.imshow('frame', mirror_frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()

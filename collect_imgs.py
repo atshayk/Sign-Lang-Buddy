@@ -5,12 +5,12 @@ home = './data'
 if not os.path.exists(home):
     os.makedirs(home)
 
-#signs = ['A','B','C','D','E','F','G','H''I','J','K','L','M','N','O',
-#         'P','Q','R','S','T','U','V','W','X','Y','Z','Yes','No',
-#         'Thank You','Hello','Please','Goodbye','Sorry']
-signs = ['A','B','C']
-number_of_classes = len(signs)
-dataset_size = 100
+#signs = ['J','Z']
+#signs = ['A','B','C','D','E','F','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y']
+signs = ['Yes','No','Thanks','Hello','Please','Goodbye','Sorry','You_Are_Welcome','I_Love_You']
+
+number_of_classes = len(signs) #len = 9
+dataset_size = 50
 sequence_length = 20 #num of frames in each sequence
 
 cap = cv2.VideoCapture(0)
@@ -25,9 +25,10 @@ for i in range(number_of_classes):
 
     while True:
         ret, frame = cap.read()
-        cv2.putText(frame, f'Collecting for {sign_name} Ready? Press "Q" to start', (50, 50), 
+        mirror_frame = cv2.flip(frame,1)
+        cv2.putText(mirror_frame, f'Collecting for {sign_name}. Press "Q" to start', (0, 50), 
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.imshow('frame', frame)
+        cv2.imshow('frame', mirror_frame)
         if cv2.waitKey(25) == ord('q'):
             break
 
@@ -35,9 +36,10 @@ for i in range(number_of_classes):
         sequence = []
         for frame_num in range(sequence_length):
             ret, frame = cap.read()
-            cv2.imshow('frame', frame)
+            mirror_frame = cv2.flip(frame,1)
+            cv2.imshow('frame', mirror_frame)
             cv2.waitKey(25)
-            sequence.append(frame)
+            sequence.append(mirror_frame)
         
         sequence_dir = os.path.join(sign_dir,f'Sequence {seq}')
         if not os.path.exists(sequence_dir):
