@@ -2,5 +2,10 @@ Requirements
 pip install opencv-python
 pip install mediapipe #(version doesnt matter)
 pip install -U scikit-learn
+pip install imutils #resize + change aspect ratio 
+pip install flask
+pip install flask_socketio
+pip install flask-cors
 #python 3.8.10 works for now, need to try with latest python version
-Libraries used: cv2, os, pickle, sklearn, numpy
+Libraries used: cv2, os, pickle, sklearn, numpy, tensorflow, imutils, flask
+pip install tensorflow

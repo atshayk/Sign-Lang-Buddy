@@ -7,11 +7,11 @@ if not os.path.exists(home):
 
 #signs = ['J','Z']
 #signs = ['A','B','C','D','E','F','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y']
-signs = ['Yes','No','Thanks','Hello','Please','Goodbye','Sorry','You_Are_Welcome','I_Love_You']
+signs = ['Yes','No','Thanks','Hello','You_Are_Welcome','I_Love_You']
 
-number_of_classes = len(signs) #len = 9
+number_of_classes = len(signs) #len = 6
 dataset_size = 50
-sequence_length = 20 #num of frames in each sequence
+#sequence_length = 35 #num of frames in each sequence
 
 cap = cv2.VideoCapture(0)
 
@@ -27,26 +27,17 @@ for i in range(number_of_classes):
         ret, frame = cap.read()
         mirror_frame = cv2.flip(frame,1)
         cv2.putText(mirror_frame, f'Collecting for {sign_name}. Press "Q" to start', (0, 50), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow('frame', mirror_frame)
         if cv2.waitKey(25) == ord('q'):
             break
 
-    for seq in range(dataset_size):
-        sequence = []
-        for frame_num in range(sequence_length):
-            ret, frame = cap.read()
-            mirror_frame = cv2.flip(frame,1)
-            cv2.imshow('frame', mirror_frame)
-            cv2.waitKey(25)
-            sequence.append(mirror_frame)
-        
-        sequence_dir = os.path.join(sign_dir,f'Sequence {seq}')
-        if not os.path.exists(sequence_dir):
-            os.makedirs(sequence_dir)
-        
-        for frame_num, frame in enumerate(sequence):
-            cv2.imwrite(os.path.join(sequence_dir,f'Frame {frame_num}.jpg'),frame)
+    for num in range(dataset_size):
+        ret, frame = cap.read()
+        mirror_frame = cv2.flip(frame,1)
+        cv2.imshow('frame', mirror_frame)
+        cv2.waitKey(25)
+        cv2.imwrite(os.path.join(sign_dir,f'{signs[i]} Image {num}.jpg'),mirror_frame)
 
 cap.release()
 cv2.destroyAllWindows()

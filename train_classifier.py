@@ -1,34 +1,43 @@
 import pickle
-from tkinter import SE
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
+# from tensorflow.keras.models import Sequential
+# from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization
+# from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelBinarizer
+from sklearn.naive_bayes import GaussianNB
 
+# Load data
 data_dict = pickle.load(open('./data_sequences.pickle', 'rb'))
-
 data = np.asarray(data_dict['data'])
 labels = np.asarray(data_dict['labels'])
 
+# Encode labels
 lb = LabelBinarizer()
 labels = lb.fit_transform(labels)
 
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True)#, stratify=labels)
+# Split data
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True,stratify=labels) # type: ignore
 
-model = Sequential()
-model.add(LSTM(64, return_sequences=True,input_shape=(20,42)))
-model.add(LSTM(64))
-model.add(Dense(9,activation = 'softmax'))
+# Define model
+model = RandomForestClassifier()
+# model = Sequential()
+# model.add(Dense(50,input_shape=(None,50,42)))
+# model.add(Dense(30))
+# model.add(Dense(15))
+# model.add(Dense(6, activation='softmax'))
 
-model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+# model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(x_train, y_train,epochs=50,validation_data=(x_test,y_test))
+# # Define callbacks
+# early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+# model_checkpoint = ModelCheckpoint('best_asl_model.h5', save_best_only=True)
 
-#y_predict = model.predict(x_test)
+# Train model
+model.fit(x_train, y_train)
 
-#score = accuracy_score(y_predict, y_test)
-#print('{}% of samples were classified correctly !'.format(score * 100))
-
-model.save('asl_lstm_model.h5')
+# Save final model
+f = open('model.p', 'wb')
+pickle.dump({'model': model}, f)
+f.close()
