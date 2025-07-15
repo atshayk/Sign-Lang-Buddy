@@ -1,14 +1,56 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0
+  padding: 0;
+  background-color: rgb(18,24,39);
 }
 
 header {
-  background-color: #333;
-  color: #fff;
-  padding: 20px;
-  text-align: center;
+    color:lightskyblue;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align:center;
+    border: 2px solid lightskyblue; /* 👈 Adds the box */
+    border-radius: 12px;            /* 👈 Rounded corners */
+    width: fit-content;
+    padding: 20px;
+    margin: 20px auto; /* Centers the header */
+}
+
+nav {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+  margin: 20px auto; /* adds top spacing and centers */
+  background-color: rgb(18, 24, 39);
+  border: 1px solid lightskyblue; /* 👈 Adds the box */
+  border-radius: 12px;            /* 👈 Rounded corners */
+  width: fit-content;             /* box wraps nav items */
+}
+
+av ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li {
+    color: lightskyblue;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: lightskyblue;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+nav ul li a:hover {
+    color: orangered;
 }
 
 main {
@@ -16,26 +58,43 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  background-color: rgb(18,24,39);
 }
 
 .video-container {
   margin-bottom: 20px;
+  padding: 10px;
 }
 
 video {
   max-width: 100%;
-  border: 1px solid #ccc;
+  border: 2px solid lightskyblue;
 }
 
 button {
   background-color: #007bff;
   color: #fff;
   border: none;
+  border-radius: 12px;
   padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: orangered;
+}
+
+footer{
+  text-align: center;
+  padding: 10px;
+  background-color: rgb(18,24,39);
+  color: lightskyblue;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+footer:hover {
+color: orangered;
 }

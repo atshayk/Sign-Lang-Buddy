@@ -6,10 +6,10 @@ let cameraOn = false;
 toggleCameraButton.addEventListener('click', () => {
   if (!cameraOn) {
     startCamera();
-    toggleCameraButton.textContent = 'Turn off Camera';
+    toggleCameraButton.textContent = 'Toggle Camera';
   } else {
     stopCamera();
-    toggleCameraButton.textContent = 'Turn on Camera';
+    toggleCameraButton.textContent = 'Toggle Camera';
   }
 });
 
