@@ -1,6 +1,11 @@
+# step 1: collect images for each sign
+# turns on the camera and records every frame for each sign
+# logs every sign in a separate folder
+
 import os
 import cv2
 
+# Create a directory to store the images if it doesn't exist
 home = './data'
 if not os.path.exists(home):
     os.makedirs(home)
@@ -21,7 +26,7 @@ for i in range(number_of_classes):
     if not os.path.exists(sign_dir):
         os.makedirs(sign_dir)
 
-    print(f'Collecting data for sign: {sign_name}')
+    print(f'Collecting data for sign: {sign_name}') #debugging
 
     while True:
         ret, frame = cap.read()
