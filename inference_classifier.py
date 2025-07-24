@@ -1,3 +1,5 @@
+# step 4: loading pre-existing model and the model predicts in real time what sign is being shown
+
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -6,7 +8,7 @@ import pickle
 import time
 
 # Load the trained model
-model_dict = pickle.load(open('./model.p', 'rb'))
+model_dict = pickle.load(open('./model.pickle', 'rb'))
 model = model_dict['model']
 
 # Initialize Mediapipe Hands

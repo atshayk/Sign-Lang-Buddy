@@ -1,3 +1,5 @@
+# step 2: go through the dataset and create a pickle file with the data and labels
+
 import os
 import pickle
 import mediapipe as mp
@@ -38,7 +40,6 @@ for sign_name in os.listdir(home):
                             y = hand_landmarks.landmark[i].y
                             data_aux.append(x - min(x_))
                             data_aux.append(y - min(y_))
-
 
             if len(data_aux) == 42:
                 data.append(data_aux)

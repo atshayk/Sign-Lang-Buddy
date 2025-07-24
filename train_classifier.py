@@ -1,3 +1,5 @@
+# step 3: train the classifier using the collected data
+
 import pickle
 import numpy as np
 # from tensorflow.keras.models import Sequential
@@ -38,6 +40,6 @@ model = RandomForestClassifier()
 model.fit(x_train, y_train)
 
 # Save final model
-f = open('model.p', 'wb')
+f = open('model.pickle', 'wb')
 pickle.dump({'model': model}, f)
 f.close()
